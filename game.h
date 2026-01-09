@@ -50,13 +50,15 @@ typedef struct {
 void freeMonster(void* data);
 int compareMonsters(void* a, void* b);
 void printMonster(void* data);
+void addMonster(Room* room); 
 
 // Item functions
 void freeItem(void* data);
 int compareItems(void* a, void* b);
 void printItem(void* data);
+void addItem(Room* room); 
 
-// Game functions
+Room* findRoomByCoordinates(GameState* g, int x, int y);
 void addRoom(GameState* g);
 void initPlayer(GameState* g);
 void playGame(GameState* g);
