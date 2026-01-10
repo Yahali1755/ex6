@@ -5,6 +5,8 @@
 
 typedef enum { ARMOR, SWORD } ItemType;
 typedef enum { PHANTOM, SPIDER, DEMON, GOLEM, COBRA } MonsterType;
+typedef void (*GameFunc)(GameState*);
+typedef enum { KEEP_RUNNING, EXIT_GAME } ProgramStatus;
 
 typedef struct Item {
     char* name;
@@ -59,9 +61,19 @@ void printItem(void* data);
 void addItem(Room* room); 
 
 Room* findRoomByCoordinates(GameState* g, int x, int y);
+Room* findRoomById(GameState* g, int id);
 void addRoom(GameState* g);
+void printRoom(Room* room, Player* player);
+
 void initPlayer(GameState* g);
 void playGame(GameState* g);
 void freeGame(GameState* g);
+int isPlayerVictory(GameState* gameState);
+
+void move(GameState* gameState);
+void pickup(GameState* gameState);
+void bag(GameState* gameState);
+void fight(GameState* gameState);
+void defeated(GameState* gameState);
 
 #endif

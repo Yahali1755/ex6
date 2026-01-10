@@ -30,9 +30,6 @@ BSTNode* bstInsert(BSTNode* root, void* data, int (*compare)(void*, void*)) {
         return root;
     }
 
-    if (compare(data, root->data) == 0)
-        return root;
-
     if (compare(data, root->data) < 0) {
         root->left = bstInsert(root->left, data, compare);
     } else {
