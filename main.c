@@ -21,7 +21,8 @@ int main(int argc, char* argv[]) {
     while (running) {
         printf("\n=== MENU ===\n1.Add Room\n2.Init Player\n3.Play\n4.Exit\n");
         int c = getInt("Choice: ");
-        if (c == 4) running = 0;
+        
+        if (c == 4 || c == INVALID_INDEX) running = 0;
         else if (c >= 1 && c <= 3) actions[c](&game);
     }
 

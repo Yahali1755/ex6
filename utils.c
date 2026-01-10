@@ -7,19 +7,20 @@
 
 int getInt(const char* prompt) {
     int num;
+    int character;
 
     printf("%s", prompt);
     
     // if input of number isnt successful
     if (scanf("%d", &num) != 1) {
         // clear buffer
-        while (getchar() != '\n');
+        while ((character = getchar()) != '\n' && character != EOF);
 
         return INVALID_INDEX;
     }
 
     // clear buffer
-     while (getchar() != '\n');
+     while ((character = getchar()) != '\n' && character != EOF);
 
     return num;
 }
@@ -36,7 +37,7 @@ char *getString(const char* prompt) {
 
     printf("%s", prompt);
 
-    while ((character = getchar()) != '\n') {
+    while ((character = getchar()) != '\n' && character != EOF) {
         if (length >= capacity - 1) { 
             capacity *= 2;           
             char *temp = realloc(string, capacity * sizeof(char));
