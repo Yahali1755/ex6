@@ -84,9 +84,9 @@ Room* findRoomById(GameState* g, int id) {
 }
 
 void addRoom(GameState* gameState) {
-    Room *lastestRoom = gameState->rooms;
+    Room *latestRoom = gameState->rooms;
 
-    if (lastestRoom != NULL) {
+    if (latestRoom != NULL) {
         displayMap(gameState);
     }
 
@@ -99,7 +99,7 @@ void addRoom(GameState* gameState) {
     newRoom->item = NULL;
     newRoom->visited = 0;
 
-    if (lastestRoom == NULL) {
+    if (latestRoom == NULL) {
         newRoom->id = 0;
         newRoom->x = 0;
         newRoom->y = 0;
@@ -123,6 +123,8 @@ void addRoom(GameState* gameState) {
             newRoomX--;
         } else if (direction == 3) {
             newRoomX++;
+        } else {
+            return;
         }
 
         if (findRoomByCoordinates(gameState, newRoomX, newRoomY) != NULL) {
@@ -209,11 +211,11 @@ int compareMonsters(void* a, void* b) {
     Monster* monster1 = (Monster*)a;
     Monster* monster2 = (Monster*)b;
 
-    int compareItemNames = strcmp(monster1->name, monster2->name);
+    int compareMonsterNames = strcmp(monster1->name, monster2->name);
 
-    if (compareItemNames > 0) {
+    if (compareMonsterNames > 0) {
         return 1;
-    } else if (compareItemNames < 0) {
+    } else if (compareMonsterNames < 0) {
         return -1;
     }
 
@@ -235,7 +237,7 @@ int compareMonsters(void* a, void* b) {
         return -1;
     }
 
-    // Items are identical
+    // Monsters are identical
     return 0;
 }
 
@@ -282,10 +284,18 @@ void initPlayer(GameState* gameState) {
         return;
     }
 
+    // Prevent re-initialization to avoid memory leaks
+    if (gameState->player != NULL) {
+        return;
+    }
+
     Player *player = malloc(sizeof(Player));
 
-    if (player == NULL) 
+    if (player == NULL) {
+        printf("Player exists\n");
+
         return;
+    }
 
     player->maxHp = gameState->configMaxHp;
     player->hp = gameState->configMaxHp;
@@ -308,6 +318,7 @@ void printRoom(Room* room, Player* player) {
     printf("HP: %d/%d\n", player->hp, player->maxHp);
 }
 
+// Up is Y-1, down is Y+1 according to the assignment's instructions
 void move(GameState* gameState) {
     if (gameState->player->currentRoom->monster != NULL) {
         printf("Kill monster first\n");
@@ -316,7 +327,7 @@ void move(GameState* gameState) {
     }
 
     int direction = getInt("Direction (0=Up,1=Down,2=Left,3=Right): ");
-    Room *room;
+    Room *room = NULL;
 
     if (direction == 0) {
         room = findRoomByCoordinates(gameState, gameState->player->currentRoom->x,
@@ -364,6 +375,9 @@ int isPlayerVictory(GameState* gameState) {
     return 1;
 }
 
+/* Executes the combat loop. Damage is applied based on baseAttack values.
+   If the monster is defeated, the pointer is moved to the player's 
+   defeatedMonsters BST */
 void fight(GameState* gameState) {
     Monster *monster = gameState->player->currentRoom->monster;
     Player *player = gameState->player;
@@ -374,17 +388,23 @@ void fight(GameState* gameState) {
         return;
     }
 
-    while (monster->hp >= 0 && player->hp >=0) {
+    while (monster->hp > 0 && player->hp > 0) {
         monster->hp = monster->hp - player->baseAttack;
         printf("You deal %d damage. Monster HP: %d\n", player->baseAttack, monster->hp < 0 ? 0 : monster->hp);
 
-        if (monster->hp <= 0) break;
+        if (monster->hp <= 0) {
+            monster->hp = 0; 
+
+            break;
+        }
 
         player->hp = player->hp - monster->attack;
         printf("Monster deals %d damage. Your HP: %d\n", monster->attack, player->hp);
     }
 
     if (player->hp <= 0) {
+        player->hp = 0;
+
         printf("--- YOU DIED ---\n");
         freeGame(gameState);
         exit(0);
